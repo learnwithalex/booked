@@ -3,6 +3,7 @@ import { userIdFromSession } from "@/lib/session";
 import { primaryOrgForUser } from "@/db/seed-org";
 import { db } from "@/db";
 import { postCategorisedTxn } from "@/lib/posting";
+import { reconcileStripePayouts } from "@/lib/reconcile";
 import { learnFromCorrection } from "@/lib/categorize";
 import { CHART_CODES } from "@/db/chart";
 
@@ -38,7 +39,23 @@ export async function POST(req: Request) {
   const posted: string[] = [];
   const failed: Array<{ id: string; error: string }> = [];
 
-  for (const txn of rows) {
+  // Reconcile BEFORE posting: Stripe payouts (po_*) must link to their bank
+  // deposit leg first, or the deposit would post separately and double-count
+  // revenue. Reconcile marks both legs POSTED with one transfer entry.
+  const { matched } = await reconcileStripePayouts(org.id);
+
+  // Re-fetch: reconcile (above) flips matched payout+deposit legs to POSTED.
+  const freshRows = ids
+    ? await db.query.sourceTransactions.findMany({
+        where: (t, { and, eq, inArray }) =>
+          and(eq(t.orgId, org.id), inArray(t.id, ids!)),
+      })
+    : await db.query.sourceTransactions.findMany({
+        where: (t, { and, eq }) => and(eq(t.orgId, org.id), eq(t.status, "CATEGORISED")),
+        limit: 200,
+      });
+
+  for (const txn of freshRows) {
     if (txn.status !== "CATEGORISED" || !txn.categoryHint) continue;
     const override = overrides[txn.id];
     const code = override && CHART_CODES.has(override) ? override : txn.categoryHint;
@@ -53,5 +70,5 @@ export async function POST(req: Request) {
     }
   }
 
-  return NextResponse.json({ ok: true, posted: posted.length, failed });
+  return NextResponse.json({ ok: true, reconciled: matched, posted: posted.length, failed });
 }

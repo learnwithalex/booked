@@ -28,14 +28,18 @@ export async function POST(req: Request) {
   });
 
   const results: Array<{ id: string; accountCode: string; confidence: number; viaRule: boolean }> = [];
+  const errors: Array<{ id: string; error: string }> = [];
   for (const p of pending) {
     try {
       const r = await categorizeOne(p.id);
       if (r) results.push({ id: p.id, accountCode: r.accountCode, confidence: r.confidence, viaRule: r.viaRule !== null });
-    } catch {
-      // One bad txn (e.g. LLM hiccup) must not kill the batch.
+    } catch (e) {
+      // One bad txn must not kill the batch — but surface it.
+      const msg = e instanceof Error ? e.message : "unknown";
+      console.error(`[categorize] ${p.id} failed: ${msg}`);
+      errors.push({ id: p.id, error: msg });
     }
   }
 
-  return NextResponse.json({ ok: true, processed: results.length, results });
+  return NextResponse.json({ ok: true, processed: results.length, results, errors });
 }

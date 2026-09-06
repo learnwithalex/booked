@@ -26,13 +26,52 @@ async function main() {
     where: (o, { eq }) => eq(o.name, DEMO_ORG),
   });
   if (existing) {
+    // Teardown order respects FKs with no cascade: entry_lines → entries →
+    // source txns → rules/accounts/connections → org_users → org.
+    // (Source txns carry entry_id but no FK; org_users has no cascade to
+    // orgs, so delete it explicitly or the org delete hangs on the FK.)
+    const entryIds = (
+      await db.query.entries.findMany({
+        where: (e, { eq }) => eq(e.orgId, existing.id),
+        columns: { id: true },
+      })
+    ).map((e) => e.id);
+    for (const id of entryIds) {
+      await db.delete(schema.entryLines).where(eq(schema.entryLines.entryId, id));
+    }
+    await db.delete(schema.entries).where(eq(schema.entries.orgId, existing.id));
+    await db
+      .delete(schema.sourceTransactions)
+      .where(eq(schema.sourceTransactions.orgId, existing.id));
+    await db.delete(schema.rules).where(eq(schema.rules.orgId, existing.id));
+    await db.delete(schema.accounts).where(eq(schema.accounts.orgId, existing.id));
+    await db
+      .delete(schema.sourceConnections)
+      .where(eq(schema.sourceConnections.orgId, existing.id));
+    await db.delete(schema.orgUsers).where(eq(schema.orgUsers.orgId, existing.id));
     await db.delete(schema.orgs).where(eq(schema.orgs.id, existing.id));
     console.log("cleared existing demo org");
   }
 
-  const [user] = await db.insert(schema.users).values({ email: DEMO_EMAIL }).returning();
+  const existingUser = await db.query.users.findFirst({
+    where: (u, { eq }) => eq(u.email, DEMO_EMAIL),
+  });
+  const user =
+    existingUser ??
+    (await db.insert(schema.users).values({ email: DEMO_EMAIL }).returning()).at(0)!;
   const [org] = await db.insert(schema.orgs).values({ name: DEMO_ORG }).returning();
   await db.insert(schema.orgUsers).values({ orgId: org.id, userId: user.id, role: "owner" });
+  // Same base rules a real org gets on first login — rules path, not LLM.
+  await db
+    .insert(schema.rules)
+    .values([
+      { orgId: org.id, field: "MERCHANT", op: "CONTAINS", pattern: "STRIPE", accountCode: "4000", priority: 100, createdBy: "system" },
+      { orgId: org.id, field: "MERCHANT", op: "CONTAINS", pattern: "AMAZON WEB SERVICES", accountCode: "5110", priority: 100, createdBy: "system" },
+      { orgId: org.id, field: "MERCHANT", op: "CONTAINS", pattern: "AWS", accountCode: "5110", priority: 90, createdBy: "system" },
+      { orgId: org.id, field: "MERCHANT", op: "CONTAINS", pattern: "OPENAI", accountCode: "5120", priority: 100, createdBy: "system" },
+      { orgId: org.id, field: "MERCHANT", op: "CONTAINS", pattern: "ANTHROPIC", accountCode: "5120", priority: 100, createdBy: "system" },
+    ])
+    .onConflictDoNothing();
   await db.insert(schema.accounts).values(
     CHART_OF_ACCOUNTS.map((a) => ({
       orgId: org.id,

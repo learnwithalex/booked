@@ -60,11 +60,25 @@ export async function applyRules(orgId: string, txn: SourceTransaction): Promise
 
 const CHART_PROMPT = CHART_OF_ACCOUNTS.map((a) => `${a.code} ${a.name}`).join("\n");
 
+function anthropicClient(): Anthropic {
+  // Concentrate gateway support: when ANTHROPIC_BASE_URL points at the
+  // gateway, auth rides ANTHROPIC_AUTH_TOKEN (API key stays empty so the
+  // SDK doesn't route around the meter). Plain Anthropic otherwise.
+  if (process.env.ANTHROPIC_BASE_URL) {
+    return new Anthropic({
+      baseURL: process.env.ANTHROPIC_BASE_URL,
+      apiKey: "gateway",
+      defaultHeaders: { Authorization: `Bearer ${process.env.ANTHROPIC_AUTH_TOKEN ?? ""}` },
+    });
+  }
+  return new Anthropic();
+}
+
 export async function categorizeWithClaude(
   txn: SourceTransaction,
   examples: Array<{ merchant: string | null; description: string | null; amountCents: number; accountCode: string }> = [],
 ): Promise<Categorisation> {
-  const client = new Anthropic();
+  const client = anthropicClient();
   const exampleBlock =
     examples.length > 0
       ? `Previously confirmed categorisations from this business (follow the same pattern):\n${examples
@@ -73,7 +87,10 @@ export async function categorizeWithClaude(
       : "";
 
   const message = await client.messages.create({
-    model: "claude-haiku-4-5-20251001",
+    // Gateway model ids are unversioned (concentrate remaps the tier);
+    // plain Anthropic takes the dated snapshot. Centralise if a third
+    // caller appears.
+    model: process.env.ANTHROPIC_BASE_URL ? "claude-haiku-4-5" : "claude-haiku-4-5-20251001",
     max_tokens: 300,
     tools: [
       {
@@ -94,7 +111,7 @@ export async function categorizeWithClaude(
     messages: [
       {
         role: "user",
-        content: `You are the bookkeeper for a US solo-founder SaaS business. Categorise this transaction into the chart of accounts. Money IN (positive amount) is usually revenue or a transfer; money OUT is usually an expense. Stripe payouts arriving in the bank are transfers from Stripe Clearing (1100), NOT new revenue.
+        content: `You are the bookkeeper for a US solo-founder SaaS business. Categorise this transaction into the chart of accounts. Money IN (positive amount) is usually revenue or a transfer; money OUT is usually an expense. Return a REVENUE code (4000/4100/4200) for customer payments and charges, an EXPENSE code (5000-6100) for money spent. Only use transfer code 1100 (Stripe Clearing) or 6200 (Transfers) when the merchant/description explicitly names a transfer or payout between the business's own accounts; Stripe charges from customers are revenue, never clearing.
 
 Chart of accounts:
 ${CHART_PROMPT}
@@ -131,6 +148,23 @@ export async function categorizeOne(txnId: string): Promise<Categorisation | nul
     where: (t, { eq }) => eq(t.id, txnId),
   });
   if (!txn || txn.status !== "PENDING") return null;
+
+  // Stripe payout arrivals are NEVER revenue — they're transfers from
+  // Stripe Clearing that reconcile must pair with a bank deposit. Pin them
+  // before rules/LLM can mislabel them (e.g. a broad STRIPE→4000 rule).
+  if (txn.externalId.startsWith("po_")) {
+    const result: Categorisation = {
+      accountCode: "1100",
+      confidence: 100,
+      reasoning: "Stripe payout arrival: transfer from Stripe Clearing (1100), paired with bank deposit at reconcile time.",
+      viaRule: null,
+    };
+    await db
+      .update(sourceTransactions)
+      .set({ status: "CATEGORISED", confidence: 100, categoryHint: "1100", updatedAt: new Date() })
+      .where(eq(sourceTransactions.id, txn.id));
+    return result;
+  }
 
   const viaRules = await applyRules(txn.orgId, txn);
   const result = viaRules ?? (await categorizeWithClaude(txn, await confirmedExamples(txn.orgId)));

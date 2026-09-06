@@ -162,8 +162,9 @@ export const sourceTransactions = pgTable(
     status: sourceTxnStatusEnum("status").notNull().default("PENDING"),
     confidence: integer("confidence"),
     categoryHint: text("category_hint"),
-    // Entry this txn posted as (null until posted).
-    entryId: uuid("entry_id").unique(),
+    // Entry this txn posted as (null until posted). Non-unique: a
+    // reconciled Stripe payout and its bank deposit leg share one entry.
+    entryId: uuid("entry_id"),
     ignoredReason: text("ignored_reason"),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
     updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),

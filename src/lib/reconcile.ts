@@ -25,8 +25,9 @@ export async function reconcileStripePayouts(orgId: string): Promise<ReconResult
     orderBy: (t, { asc }) => [asc(t.occurredAt)],
   });
 
+  // Only CATEGORISED payouts: POSTED ones already have their entry.
   const unreconciled = payouts.filter(
-    (p) => p.externalId.startsWith("po_") && !p.entryId,
+    (p) => p.externalId.startsWith("po_") && !p.entryId && p.status === "CATEGORISED",
   );
 
   let matched = 0;
@@ -48,19 +49,35 @@ export async function reconcileStripePayouts(orgId: string): Promise<ReconResult
       limit: 10,
     });
 
+    // Bank leg must still be unposted (CATEGORISED): a POSTED leg already
+    // has its own entry and must not be folded into the payout's.
     const bankLeg = candidates.find(
       (c) =>
         !c.externalId.startsWith("po_") &&
         !c.externalId.startsWith("bt_") &&
         /stripe/i.test(`${c.merchant ?? ""} ${c.description ?? ""}`) &&
-        c.status !== "IGNORED",
+        c.status === "CATEGORISED" &&
+        !c.entryId,
     );
 
     if (bankLeg) {
       // Post the payout as a transfer 1000→1100, then link the bank leg to
       // the same entry instead of posting it separately (prevents the
-      // double-count: the bank deposit IS the payout arriving).
-      const entryId = await postCategorisedTxn(orgId, payout.id, "1100", "agent");
+      // double-count: the bank deposit IS the payout arriving). postEntry is
+      // called directly (not postCategorisedTxn): the payout hint is a
+      // category code but this event is always a transfer.
+      const { postEntry } = await import("./posting");
+      const entryId = await postEntry({
+        orgId,
+        occurredAt: payout.occurredAt,
+        memo: payout.description ?? "Stripe payout",
+        createdBy: "agent",
+        lines: [
+          { accountCode: "1000", debitCents: cents },
+          { accountCode: "1100", creditCents: cents },
+        ],
+        sourceTxnId: payout.id,
+      });
       await db
         .update(sourceTransactions)
         .set({ status: "POSTED", entryId, updatedAt: new Date() })
