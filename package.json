@@ -5,7 +5,7 @@
   "description": "Autonomous bookkeeping for solo founders. Built during The Build Games, Sep 6-30 2026.",
   "scripts": {
     "dev": "next dev",
-    "build": "prisma generate && next build",
+    "build": "npx prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
