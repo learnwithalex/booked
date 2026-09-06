@@ -2,45 +2,161 @@ import { redirect } from "next/navigation";
 import { userIdFromSession } from "@/lib/session";
 import { primaryOrgForUser } from "@/db/seed-org";
 import { db } from "@/db";
-
-// Shell for the authenticated app. Data views (transactions inbox,
-// statements, close packet) land here next.
+import { profitAndLoss, balanceSheet, fmtCents } from "@/lib/statements";
+import { RunAgentButton } from "./run-agent-button";
 
 export default async function AppPage() {
   const userId = await userIdFromSession();
   if (!userId) redirect("/login");
-
   const org = await primaryOrgForUser(userId);
   if (!org) redirect("/login?error=noorg");
 
-  const [txnCount, accountCount] = await Promise.all([
+  const now = new Date();
+  const year = now.getUTCFullYear();
+  const month = now.getUTCMonth() + 1;
+  const asOf = new Date(Date.UTC(year, month, 0, 23, 59, 59));
+
+  const [pl, bs, pendingRows] = await Promise.all([
+    profitAndLoss(org.id, year, month),
+    balanceSheet(org.id, asOf),
     db.query.sourceTransactions.findMany({
-      where: (t, { eq }) => eq(t.orgId, org.id),
-      columns: { id: true },
-    }),
-    db.query.accounts.findMany({
-      where: (a, { eq }) => eq(a.orgId, org.id),
+      where: (t, { and, eq, inArray }) =>
+        and(eq(t.orgId, org.id), inArray(t.status, ["PENDING", "CATEGORISED"])),
       columns: { id: true },
     }),
   ]);
 
+  const monthName = now.toLocaleString("en-US", { month: "long", timeZone: "UTC" });
+  const pendingReviews = pendingRows.length;
+  const cashCents = bs.assets.find((a) => a.code === "1000")?.balanceCents ?? 0;
+
   return (
-    <main className="mx-auto max-w-2xl px-6 py-16">
+    <main className="mx-auto max-w-5xl px-6 py-12">
       <div className="mb-2 text-xs uppercase tracking-wider text-neutral-500">{org.name}</div>
-      <h1 className="mb-8 text-2xl font-semibold tracking-tight">Overview</h1>
-      <div className="grid grid-cols-2 gap-4">
-        <div className="rounded border border-neutral-200 bg-white p-6">
-          <div className="mb-1 text-xs uppercase tracking-wider text-neutral-500">Transactions</div>
-          <div className="text-3xl font-semibold tabular-nums">{txnCount.length}</div>
+      <div className="mb-8 flex items-end justify-between">
+        <h1 className="text-2xl font-semibold tracking-tight">
+          {monthName} {year}
+        </h1>
+        <RunAgentButton />
+      </div>
+
+      {/* KPI row */}
+      <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <KPI label="Revenue" value={fmtCents(pl.totalRevenueCents)} />
+        <KPI label="Expenses" value={fmtCents(pl.totalExpenseCents)} />
+        <KPI
+          label="Net income"
+          value={fmtCents(pl.netIncomeCents)}
+          highlight={pl.netIncomeCents > 0 ? "green" : pl.netIncomeCents < 0 ? "red" : undefined}
+        />
+        <KPI label="Cash balance" value={fmtCents(cashCents)} />
+      </div>
+
+      {/* P&L breakdown */}
+      <div className="mb-8 rounded border border-neutral-200 bg-white">
+        <div className="border-b border-neutral-200 px-6 py-3">
+          <span className="text-xs font-semibold uppercase tracking-wider text-neutral-500">
+            P&amp;L — {monthName}
+          </span>
         </div>
-        <div className="rounded border border-neutral-200 bg-white p-6">
-          <div className="mb-1 text-xs uppercase tracking-wider text-neutral-500">Accounts</div>
-          <div className="text-3xl font-semibold tabular-nums">{accountCount.length}</div>
+        <div className="px-6 py-4">
+          {pl.revenue.length === 0 && pl.expenses.length === 0 ? (
+            <p className="text-sm text-neutral-500">
+              No transactions posted yet.{" "}
+              {pendingReviews > 0
+                ? `${pendingReviews} transaction${pendingReviews !== 1 ? "s" : ""} ready — click Run bookkeeper.`
+                : "Connect a source to import transactions."}
+            </p>
+          ) : (
+            <>
+              {pl.revenue.map((l) => (
+                <Row key={l.code} label={`${l.code} · ${l.name}`} value={fmtCents(l.totalCents)} />
+              ))}
+              {pl.expenses.map((l) => (
+                <Row
+                  key={l.code}
+                  label={`${l.code} · ${l.name}`}
+                  value={`(${fmtCents(l.totalCents)})`}
+                  dim
+                />
+              ))}
+              <div className="mt-3 border-t border-neutral-100 pt-3 flex items-baseline justify-between">
+                <span className="text-sm font-semibold">Net income</span>
+                <span
+                  className={`font-mono text-sm font-semibold ${
+                    pl.netIncomeCents >= 0 ? "text-emerald-700" : "text-red-600"
+                  }`}
+                >
+                  {fmtCents(pl.netIncomeCents)}
+                </span>
+              </div>
+            </>
+          )}
         </div>
       </div>
-      <p className="mt-8 text-sm text-neutral-600">
-        No sources connected yet. Plaid (bank) and Stripe (revenue) connections land here next.
-      </p>
+
+      {/* Quick links */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="rounded border border-neutral-200 bg-white p-6">
+          <div className="mb-1 text-xs uppercase tracking-wider text-neutral-500">Pending review</div>
+          <div className="text-3xl font-semibold tabular-nums">{pendingReviews}</div>
+          {pendingReviews > 0 && (
+            <a
+              href="/app/transactions"
+              className="mt-3 block text-xs text-neutral-500 underline underline-offset-2 hover:text-neutral-700"
+            >
+              Review inbox →
+            </a>
+          )}
+        </div>
+        <div className="rounded border border-neutral-200 bg-white p-6">
+          <div className="mb-1 text-xs uppercase tracking-wider text-neutral-500">Statements</div>
+          <div className="text-sm text-neutral-700">P&amp;L · Balance sheet</div>
+          <a
+            href="/app/statements"
+            className="mt-3 block text-xs text-neutral-500 underline underline-offset-2 hover:text-neutral-700"
+          >
+            View statements →
+          </a>
+        </div>
+      </div>
     </main>
+  );
+}
+
+function KPI({
+  label,
+  value,
+  highlight,
+}: {
+  label: string;
+  value: string;
+  highlight?: "green" | "red";
+}) {
+  const valueClass =
+    highlight === "green"
+      ? "text-emerald-700"
+      : highlight === "red"
+      ? "text-red-600"
+      : "text-neutral-900";
+
+  return (
+    <div className="rounded border border-neutral-200 bg-white p-5">
+      <div className="mb-1 text-xs uppercase tracking-wider text-neutral-500">{label}</div>
+      <div className={`text-xl font-semibold tabular-nums ${valueClass}`}>{value}</div>
+    </div>
+  );
+}
+
+function Row({ label, value, dim }: { label: string; value: string; dim?: boolean }) {
+  return (
+    <div
+      className={`flex items-baseline justify-between py-0.5 text-sm ${
+        dim ? "text-neutral-500" : "text-neutral-800"
+      }`}
+    >
+      <span>{label}</span>
+      <span className="font-mono tabular-nums">{value}</span>
+    </div>
   );
 }

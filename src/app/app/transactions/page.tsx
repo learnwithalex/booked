@@ -13,8 +13,7 @@ export default async function TransactionsPage() {
   if (!org) redirect("/login?error=noorg");
 
   const rows = await db.query.sourceTransactions.findMany({
-    where: (t, { and, eq, inArray }) =>
-      and(eq(t.orgId, org.id), inArray(t.status, ["PENDING", "CATEGORISED"])),
+    where: (t, { eq }) => eq(t.orgId, org.id),
     orderBy: (t, { desc }) => [desc(t.occurredAt)],
     limit: 200,
   });
@@ -41,7 +40,7 @@ export default async function TransactionsPage() {
     <main className="mx-auto max-w-4xl px-6 py-16">
       <div className="mb-2 text-xs uppercase tracking-wider text-neutral-500">{org.name}</div>
       <h1 className="mb-8 text-2xl font-semibold tracking-tight">
-        Review inbox{" "}
+        Transactions{" "}
         <span className="text-base font-normal text-neutral-500">({rows.length})</span>
       </h1>
       <InboxClient initial={serialised} accounts={accounts} />
