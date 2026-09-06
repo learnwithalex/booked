@@ -7,8 +7,13 @@
   --fg: #1a1a1a;
   --muted: #6b6b6b;
   --border: #e6e4e0;
-  --accent: #1a1a1a;
-  --ink: #14161a;
+  --accent: #124f3a;
+  --ink: #14171a;
+}
+
+::selection {
+  background: #d3e9dd;
+  color: #0a2c21;
 }
 
 html,

@@ -6,15 +6,16 @@ export const metadata = {
     "Bench shut down. Pilot starts at $499/mo. Booked connects your bank and Stripe, categorises every transaction, reconciles payouts, and closes your month from a real double-entry ledger.",
 };
 
+const GITHUB = "https://github.com/learnwithalex/booked";
+
 export default function Home() {
   return (
-    <main className="min-h-screen bg-neutral-50">
+    <main className="min-h-screen bg-stone-50">
       <SiteNav />
       <Hero />
-      <TrustBar />
       <ProductPreview />
-      <TheGap />
       <HowItWorks />
+      <LedgerBand />
       <Features />
       <Pricing />
       <Faq />
@@ -24,15 +25,122 @@ export default function Home() {
   );
 }
 
-/* ---------------------------------------------------------------- nav */
+/* ============================================================== icons */
+
+type IconProps = { className?: string };
+
+function Icon({ children, className = "h-5 w-5" }: IconProps & { children: React.ReactNode }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={1.5}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+      className={className}
+    >
+      {children}
+    </svg>
+  );
+}
+
+const IconPlug = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M9 3v5M15 3v5" />
+    <path d="M6 8h12v3a6 6 0 0 1-6 6 6 6 0 0 1-6-6V8Z" />
+    <path d="M12 17v4" />
+  </Icon>
+);
+
+const IconSparkle = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M12 3l1.9 5.1L19 10l-5.1 1.9L12 17l-1.9-5.1L5 10l5.1-1.9L12 3Z" />
+    <path d="M18.5 16.5l.7 1.8 1.8.7-1.8.7-.7 1.8-.7-1.8-1.8-.7 1.8-.7.7-1.8Z" />
+  </Icon>
+);
+
+const IconSwap = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M4 8h13l-3.2-3.2M20 16H7l3.2 3.2" />
+  </Icon>
+);
+
+const IconStatement = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M6 3h9l4 4v14a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z" />
+    <path d="M14 3v5h5" />
+    <path d="M9 17v-3M12 17v-6M15 17v-4" />
+  </Icon>
+);
+
+const IconScale = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M12 4v16M7 20h10" />
+    <path d="M3 9h7l-3.5 6a3.5 3.5 0 0 1-3.5-6ZM14 9h7l-3.5 6a3.5 3.5 0 0 1-3.5-6Z" />
+    <path d="M12 6l-9 3M12 6l9 3" />
+  </Icon>
+);
+
+const IconGauge = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M3.5 17a9 9 0 1 1 17 0" />
+    <path d="M12 17l4-5" />
+    <circle cx="12" cy="17" r="1.2" />
+  </Icon>
+);
+
+const IconLoop = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M4 12a8 8 0 0 1 13.7-5.6L20 8" />
+    <path d="M20 4v4h-4" />
+    <path d="M20 12a8 8 0 0 1-13.7 5.6L4 16" />
+    <path d="M4 20v-4h4" />
+  </Icon>
+);
+
+const IconCode = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M9 6l-5 6 5 6M15 6l5 6-5 6" />
+  </Icon>
+);
+
+const IconLock = (p: IconProps) => (
+  <Icon {...p}>
+    <rect x="4" y="10" width="16" height="11" rx="1.5" />
+    <path d="M8 10V7a4 4 0 0 1 8 0v3" />
+    <path d="M12 15v2" />
+  </Icon>
+);
+
+const IconCheck = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M4.5 12.5l5 5 10-11" />
+  </Icon>
+);
+
+const IconChevron = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M6 9l6 6 6-6" />
+  </Icon>
+);
+
+const IconArrow = (p: IconProps) => (
+  <Icon {...p}>
+    <path d="M5 12h14M13 6l6 6-6 6" />
+  </Icon>
+);
+
+/* ================================================================ nav */
 
 function SiteNav() {
   return (
-    <header className="sticky top-0 z-50 border-b border-neutral-200 bg-neutral-50/85 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-stone-200/80 bg-stone-50/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-6xl items-center gap-8 px-6 py-3.5">
-        <Link href="/" className="flex items-center gap-2">
+        <Link href="/" className="flex items-center gap-2.5">
           <Mark />
-          <span className="text-[15px] font-semibold tracking-tight text-neutral-900">Booked</span>
+          <span className="text-[15px] font-semibold tracking-tight text-ink">Booked</span>
         </Link>
 
         <nav className="hidden items-center gap-1 md:flex">
@@ -42,16 +150,16 @@ function SiteNav() {
           <TopLink href="#faq">FAQ</TopLink>
         </nav>
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-1.5">
           <Link
             href="/login"
-            className="rounded px-3 py-1.5 text-sm text-neutral-600 transition-colors hover:text-neutral-900"
+            className="rounded px-3 py-1.5 text-sm text-stone-600 transition-colors hover:text-ink"
           >
             Log in
           </Link>
           <Link
             href="/login"
-            className="rounded bg-neutral-900 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-neutral-700"
+            className="rounded bg-forest-700 px-4 py-1.5 text-sm font-medium text-white transition-colors hover:bg-forest-800"
           >
             Get started
           </Link>
@@ -65,134 +173,176 @@ function TopLink({ href, children }: { href: string; children: React.ReactNode }
   return (
     <a
       href={href}
-      className="rounded px-3 py-1.5 text-sm text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900"
+      className="rounded px-3 py-1.5 text-sm text-stone-600 transition-colors hover:bg-stone-200/60 hover:text-ink"
     >
       {children}
     </a>
   );
 }
 
-function Mark() {
+function Mark({ size = "h-6 w-6" }: { size?: string }) {
   return (
     <span
       aria-hidden
-      className="flex h-6 w-6 items-center justify-center rounded bg-neutral-900 text-[11px] font-bold text-white"
+      className={`flex ${size} items-center justify-center rounded bg-forest-700 text-[11px] font-bold text-white`}
     >
       B
     </span>
   );
 }
 
-/* --------------------------------------------------------------- hero */
+/* =============================================================== hero */
 
 function Hero() {
   return (
-    <section className="border-b border-neutral-200">
-      <div className="mx-auto max-w-6xl px-6 pb-16 pt-20 sm:pt-28">
-        <div className="max-w-3xl">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-neutral-200 bg-white px-3 py-1 text-xs text-neutral-600">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-            Built in public for The Build Games · Best Replacement
+    <section className="border-b border-stone-200">
+      <div className="mx-auto grid max-w-6xl gap-14 px-6 pb-20 pt-16 sm:pt-24 lg:grid-cols-12 lg:gap-12 lg:pb-28">
+        <div className="lg:col-span-7">
+          <div className="mb-7 inline-flex items-center gap-2 rounded-full border border-forest-200 bg-forest-50 px-3 py-1 text-xs font-medium text-forest-700">
+            <span className="relative flex h-1.5 w-1.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-forest-400 opacity-60" />
+              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-forest-500" />
+            </span>
+            Built in public for The Build Games
           </div>
 
-          <h1 className="mb-6 text-4xl font-semibold leading-[1.08] tracking-tight text-neutral-900 sm:text-6xl">
-            Confidence in your numbers,
-            <br />
-            without the $299 a month.
+          <h1 className="mb-6 text-[2.6rem] font-semibold leading-[1.02] tracking-[-0.03em] text-ink sm:text-6xl lg:text-[4.1rem]">
+            Confidence in your numbers,{" "}
+            <span className="text-forest-600">without the $299 a month.</span>
           </h1>
 
-          <p className="mb-8 max-w-2xl text-lg leading-relaxed text-neutral-600">
-            Connect your bank and Stripe. Booked categorises every transaction, matches
-            each Stripe payout to the deposit it landed in, and closes your month from a
-            real double-entry ledger — not a spreadsheet that looks like one.
+          <p className="mb-9 max-w-xl text-[17px] leading-relaxed text-stone-600">
+            Connect your bank and Stripe. Booked categorises every transaction, matches each
+            Stripe payout to the deposit it landed in, and closes your month from a real
+            double-entry ledger — not a spreadsheet that looks like one.
           </p>
 
-          <div className="mb-10 flex flex-wrap gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <Link
               href="/login"
-              className="rounded bg-neutral-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-neutral-700"
+              className="group inline-flex items-center gap-2 rounded bg-forest-700 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-forest-800"
             >
               Get started free
+              <IconArrow className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
             </Link>
             <a
               href="#how"
-              className="rounded border border-neutral-300 bg-white px-5 py-2.5 text-sm font-medium text-neutral-700 transition-colors hover:bg-neutral-50"
+              className="rounded border border-stone-300 bg-white px-5 py-2.5 text-sm font-medium text-stone-700 transition-colors hover:border-stone-400 hover:bg-stone-50"
             >
               See how it works
             </a>
           </div>
 
-          <dl className="flex flex-wrap gap-x-10 gap-y-4">
-            <Stat value="Double-entry" label="Real ledger, debits = credits" />
-            <Stat value="Zero" label="Double-counted Stripe payouts" />
-            <Stat value="Open source" label="Every commit is the receipt" />
-          </dl>
+          <p className="mt-5 text-xs text-stone-500">
+            Free during beta · No card required · MIT licensed and self-hostable
+          </p>
+        </div>
+
+        <div className="lg:col-span-5">
+          <PriceBars />
         </div>
       </div>
     </section>
   );
 }
 
-function Stat({ value, label }: { value: string; label: string }) {
+/* --------------------------------------------------- price comparison */
+
+const PRICES = [
+  { name: "Local bookkeeper", amount: "$300–1,000", pct: 100, note: "per month, typical range" },
+  { name: "Pilot", amount: "$499", pct: 50, note: "entry tier" },
+  { name: "Bench", amount: "$299", pct: 30, note: "shut down Dec 2024", dead: true },
+  { name: "Booked", amount: "$29", pct: 3, note: "unlimited transactions", us: true },
+];
+
+function PriceBars() {
   return (
-    <div>
-      <dt className="text-base font-semibold tracking-tight text-neutral-900">{value}</dt>
-      <dd className="text-xs text-neutral-500">{label}</dd>
+    <div className="rounded-lg border border-stone-200 bg-white p-6 sm:p-7">
+      <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-stone-400">
+        What a month of books costs
+      </div>
+      <div className="mb-6 text-sm text-stone-500">Same statements. Same chart of accounts.</div>
+
+      <div className="space-y-5">
+        {PRICES.map((p) => (
+          <div key={p.name}>
+            <div className="mb-1.5 flex items-baseline justify-between gap-3">
+              <span
+                className={`text-sm ${
+                  p.us ? "font-semibold text-ink" : "font-medium text-stone-600"
+                } ${p.dead ? "line-through decoration-stone-400" : ""}`}
+              >
+                {p.name}
+              </span>
+              <span
+                className={`font-mono text-sm tabular-nums ${
+                  p.us ? "font-semibold text-forest-700" : "text-stone-500"
+                }`}
+              >
+                {p.amount}
+              </span>
+            </div>
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-stone-100">
+              <div
+                className={`h-full rounded-full ${p.us ? "bg-forest-600" : "bg-stone-300"}`}
+                style={{ width: `${Math.max(p.pct, 4)}%` }}
+              />
+            </div>
+            <div className="mt-1.5 text-xs text-stone-400">{p.note}</div>
+          </div>
+        ))}
+      </div>
+
+      <p className="mt-6 border-t border-stone-200 pt-5 text-xs leading-relaxed text-stone-500">
+        The difference is not that we cut corners on the accounting. It is that the part which
+        used to need a person every month no longer does.
+      </p>
     </div>
   );
 }
 
-/* ---------------------------------------------------------- trust bar */
-
-function TrustBar() {
-  return (
-    <section className="border-b border-neutral-200 bg-white">
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center gap-x-8 gap-y-3 px-6 py-5">
-        <span className="text-xs uppercase tracking-wider text-neutral-400">Works with</span>
-        {["Plaid", "Stripe", "Any US bank", "CSV export", "Your accountant"].map((s) => (
-          <span key={s} className="text-sm font-medium text-neutral-500">
-            {s}
-          </span>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-/* ----------------------------------------------------- product preview */
+/* ==================================================== product preview */
 
 function ProductPreview() {
   return (
-    <section className="border-b border-neutral-200 bg-neutral-100/60">
-      <div className="mx-auto max-w-6xl px-6 py-16">
-        <div className="mb-8 max-w-2xl">
-          <h2 className="mb-3 text-2xl font-semibold tracking-tight text-neutral-900 sm:text-3xl">
-            Your month, already closed.
-          </h2>
-          <p className="text-base leading-relaxed text-neutral-600">
-            Not a to-do list of receipts to sort. You open Booked and the numbers are
-            there, with every figure traceable to the journal entry that produced it.
-          </p>
+    <section className="border-b border-stone-200 bg-sand-100">
+      <div className="mx-auto max-w-6xl px-6 py-20 sm:py-28">
+        <div className="mb-12 max-w-2xl">
+          <SectionEyebrow>The product</SectionEyebrow>
+          <SectionTitle>Your month, already closed.</SectionTitle>
+          <SectionLede>
+            Not a to-do list of receipts to sort. You open Booked and the numbers are there,
+            with every figure traceable to the journal entry that produced it.
+          </SectionLede>
         </div>
 
-        <div className="overflow-hidden rounded-md border border-neutral-300 bg-white">
-          {/* chrome */}
-          <div className="flex items-center gap-2 border-b border-neutral-200 bg-neutral-50 px-4 py-2.5">
-            <span className="h-2.5 w-2.5 rounded-full bg-neutral-300" />
-            <span className="h-2.5 w-2.5 rounded-full bg-neutral-300" />
-            <span className="h-2.5 w-2.5 rounded-full bg-neutral-300" />
-            <span className="ml-3 text-xs text-neutral-400">booked.app/app</span>
+        <div className="overflow-hidden rounded-lg border border-stone-300/70 bg-white shadow-[0_1px_2px_rgba(20,23,26,0.04),0_18px_44px_-16px_rgba(20,23,26,0.22)]">
+          {/* app chrome — the product's own nav, not a fake browser */}
+          <div className="flex items-center gap-6 border-b border-stone-200 bg-stone-50 px-5 py-3">
+            <div className="flex items-center gap-2">
+              <Mark size="h-5 w-5" />
+              <span className="text-[13px] font-semibold tracking-tight text-ink">Booked</span>
+            </div>
+            <div className="hidden items-center gap-5 text-[13px] sm:flex">
+              <span className="border-b-2 border-forest-600 pb-3 -mb-3 font-medium text-ink">
+                Overview
+              </span>
+              <span className="text-stone-500">Transactions</span>
+              <span className="text-stone-500">Statements</span>
+            </div>
+            <span className="ml-auto flex h-6 w-6 items-center justify-center rounded-full bg-stone-200 text-[10px] font-medium text-stone-600">
+              NS
+            </span>
           </div>
 
-          <div className="p-6 sm:p-8">
-            <div className="mb-1 text-xs uppercase tracking-wider text-neutral-500">
+          <div className="p-6 sm:p-9">
+            <div className="mb-1.5 text-xs uppercase tracking-wider text-stone-500">
               Northwind Studio
             </div>
-            <div className="mb-6 flex items-end justify-between">
-              <div className="text-xl font-semibold tracking-tight text-neutral-900">
-                August 2026
-              </div>
-              <span className="rounded bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700">
+            <div className="mb-7 flex flex-wrap items-end justify-between gap-3">
+              <div className="text-2xl font-semibold tracking-tight text-ink">August 2026</div>
+              <span className="inline-flex items-center gap-1.5 rounded-full bg-forest-50 px-3 py-1 text-xs font-medium text-forest-700">
+                <IconCheck className="h-3.5 w-3.5" />
                 Books closed
               </span>
             </div>
@@ -204,33 +354,31 @@ function ProductPreview() {
               <MockKpi label="Cash balance" value="$18,204.55" />
             </div>
 
-            <div className="rounded border border-neutral-200">
-              <div className="border-b border-neutral-200 px-4 py-2.5 text-xs font-semibold uppercase tracking-wider text-neutral-500">
+            <div className="rounded border border-stone-200">
+              <div className="border-b border-stone-200 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-stone-500">
                 Profit &amp; loss — August
               </div>
-              <div className="px-4 py-3">
+              <div className="px-5 py-4">
                 <MockRow label="4000 · Product revenue" value="$11,940.00" />
                 <MockRow label="4100 · Consulting" value="$540.00" />
                 <MockRow label="6000 · Hosting" value="($1,284.30)" dim />
                 <MockRow label="6100 · Software" value="($2,447.88)" dim />
                 <MockRow label="6300 · Payment fees" value="($1,200.00)" dim />
-                <div className="mt-3 flex items-baseline justify-between border-t border-neutral-100 pt-3">
-                  <span className="text-sm font-semibold text-neutral-900">Net income</span>
-                  <span className="font-mono text-sm font-semibold tabular-nums text-emerald-700">
+                <div className="mt-3 flex items-baseline justify-between border-t border-stone-200 pt-3">
+                  <span className="text-sm font-semibold text-ink">Net income</span>
+                  <span className="font-mono text-sm font-semibold tabular-nums text-forest-700">
                     $7,547.82
                   </span>
                 </div>
               </div>
             </div>
 
-            <div className="mt-4 flex items-start gap-2 rounded border border-neutral-200 bg-neutral-50 px-4 py-3">
-              <span className="mt-0.5 text-emerald-600">✓</span>
-              <p className="text-xs leading-relaxed text-neutral-600">
-                <span className="font-medium text-neutral-900">
-                  3 Stripe payouts reconciled.
-                </span>{" "}
-                Each payout matched to its bank deposit and booked as one entry — revenue
-                counted once, fees split out, clearing account back to zero.
+            <div className="mt-4 flex items-start gap-3 rounded border border-forest-100 bg-forest-50/60 px-5 py-4">
+              <IconSwap className="mt-0.5 h-4 w-4 shrink-0 text-forest-600" />
+              <p className="text-xs leading-relaxed text-stone-600">
+                <span className="font-semibold text-ink">3 Stripe payouts reconciled.</span> Each
+                payout matched to its bank deposit and booked as one entry — revenue counted
+                once, fees split out, clearing account back to zero.
               </p>
             </div>
           </div>
@@ -242,11 +390,11 @@ function ProductPreview() {
 
 function MockKpi({ label, value, tone }: { label: string; value: string; tone?: "green" }) {
   return (
-    <div className="rounded border border-neutral-200 bg-white p-4">
-      <div className="mb-1 text-[11px] uppercase tracking-wider text-neutral-500">{label}</div>
+    <div className="rounded border border-stone-200 bg-stone-50/70 p-4">
+      <div className="mb-1 text-[11px] uppercase tracking-wider text-stone-500">{label}</div>
       <div
-        className={`text-lg font-semibold tabular-nums ${
-          tone === "green" ? "text-emerald-700" : "text-neutral-900"
+        className={`text-lg font-semibold tabular-nums tracking-tight ${
+          tone === "green" ? "text-forest-700" : "text-ink"
         }`}
       >
         {value}
@@ -258,8 +406,8 @@ function MockKpi({ label, value, tone }: { label: string; value: string; tone?: 
 function MockRow({ label, value, dim }: { label: string; value: string; dim?: boolean }) {
   return (
     <div
-      className={`flex items-baseline justify-between py-0.5 text-sm ${
-        dim ? "text-neutral-500" : "text-neutral-800"
+      className={`flex items-baseline justify-between py-1 text-sm ${
+        dim ? "text-stone-500" : "text-stone-800"
       }`}
     >
       <span>{label}</span>
@@ -268,209 +416,216 @@ function MockRow({ label, value, dim }: { label: string; value: string; dim?: bo
   );
 }
 
-/* ------------------------------------------------------------ the gap */
+/* ======================================================= how it works */
 
-function TheGap() {
-  return (
-    <section className="border-b border-neutral-200 bg-white">
-      <div className="mx-auto grid max-w-6xl gap-10 px-6 py-16 lg:grid-cols-2 lg:gap-16">
-        <div>
-          <div className="mb-3 text-xs uppercase tracking-wider text-neutral-400">
-            Why this exists
-          </div>
-          <h2 className="mb-5 text-2xl font-semibold leading-tight tracking-tight text-neutral-900 sm:text-3xl">
-            Bench shut down overnight. Nothing affordable replaced it.
-          </h2>
-          <p className="mb-4 text-base leading-relaxed text-neutral-600">
-            In December 2024, Bench closed with almost no warning and thousands of small
-            businesses woke up locked out of their own books. The replacements that
-            exist start at several hundred dollars a month — more than most bootstrapped
-            businesses spend on their entire infrastructure.
-          </p>
-          <p className="text-base leading-relaxed text-neutral-600">
-            But the work itself changed. Categorising a transaction is a language
-            problem, and language models are now good at it. Reconciliation was always
-            deterministic — it just needed someone to write the matching logic. What
-            cost $300–1,000 a month is now mostly the price of the API calls.
-          </p>
-        </div>
-
-        <div className="rounded-md border border-neutral-200 bg-neutral-50 p-6">
-          <div className="mb-4 text-xs uppercase tracking-wider text-neutral-400">
-            What a month of books costs
-          </div>
-          <CompareRow name="Bench" price="$299/mo" note="Shut down Dec 2024" struck />
-          <CompareRow name="Pilot" price="$499/mo" note="Starting tier" />
-          <CompareRow name="Local bookkeeper" price="$300–1,000/mo" note="Typical range" />
-          <CompareRow name="Booked" price="$29/mo" note="Unlimited transactions" highlight />
-          <p className="mt-5 border-t border-neutral-200 pt-4 text-xs leading-relaxed text-neutral-500">
-            The difference is not that we cut corners on the accounting. It is that the
-            part which used to need a person every month no longer does.
-          </p>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function CompareRow({
-  name,
-  price,
-  note,
-  struck,
-  highlight,
-}: {
-  name: string;
-  price: string;
-  note: string;
-  struck?: boolean;
-  highlight?: boolean;
-}) {
-  return (
-    <div
-      className={`flex items-baseline justify-between border-b border-neutral-200 py-3 last:border-0 ${
-        highlight ? "text-neutral-900" : "text-neutral-600"
-      }`}
-    >
-      <div>
-        <div className={`text-sm ${highlight ? "font-semibold" : "font-medium"}`}>{name}</div>
-        <div className="text-xs text-neutral-500">{note}</div>
-      </div>
-      <div
-        className={`font-mono text-sm tabular-nums ${
-          struck ? "text-neutral-400 line-through" : highlight ? "font-semibold" : ""
-        }`}
-      >
-        {price}
-      </div>
-    </div>
-  );
-}
-
-/* -------------------------------------------------------- how it works */
+const STEPS = [
+  {
+    icon: IconPlug,
+    title: "Connect your sources",
+    body: "Link your bank through Plaid and connect Stripe. Booked pulls transactions on a schedule and keeps pulling — no monthly CSV ritual.",
+  },
+  {
+    icon: IconSparkle,
+    title: "The agent categorises",
+    body: "Deterministic rules take the obvious ones. The model handles the rest and shows its confidence, so you review the genuinely ambiguous transactions instead of all of them.",
+  },
+  {
+    icon: IconSwap,
+    title: "Payouts get reconciled",
+    body: "Each Stripe payout is matched to the bank deposit it became. One entry, two sides: gross revenue in, fees out, deposit landed. Revenue is never counted twice.",
+  },
+  {
+    icon: IconStatement,
+    title: "Your statements are ready",
+    body: "P&L and balance sheet generated straight from the ledger, every figure traceable to its journal entry. Export whenever your accountant asks.",
+  },
+];
 
 function HowItWorks() {
   return (
-    <section id="how" className="border-b border-neutral-200 scroll-mt-16">
-      <div className="mx-auto max-w-6xl px-6 py-16">
-        <div className="mb-10 max-w-2xl">
-          <div className="mb-3 text-xs uppercase tracking-wider text-neutral-400">
-            How it works
-          </div>
-          <h2 className="text-2xl font-semibold tracking-tight text-neutral-900 sm:text-3xl">
-            Four steps, and only the first one needs you.
-          </h2>
+    <section id="how" className="scroll-mt-16 border-b border-stone-200 bg-white">
+      <div className="mx-auto max-w-6xl px-6 py-20 sm:py-28">
+        <div className="mb-14 max-w-2xl">
+          <SectionEyebrow>How it works</SectionEyebrow>
+          <SectionTitle>Four steps, and only the first one needs you.</SectionTitle>
         </div>
 
-        <div className="grid gap-px overflow-hidden rounded-md border border-neutral-200 bg-neutral-200 sm:grid-cols-2">
-          <Step
-            n="01"
-            title="Connect your sources"
-            body="Link your bank through Plaid and connect Stripe. Booked pulls transactions on a schedule and keeps pulling — no monthly CSV ritual."
-          />
-          <Step
-            n="02"
-            title="The agent categorises"
-            body="Deterministic rules take the obvious ones. The model handles the rest and shows its confidence, so you review the genuinely ambiguous transactions instead of all of them."
-          />
-          <Step
-            n="03"
-            title="Stripe payouts get reconciled"
-            body="Each payout is matched to the bank deposit it became. One entry, two sides: gross revenue in, fees out, deposit landed. Revenue is never counted twice."
-          />
-          <Step
-            n="04"
-            title="Your statements are ready"
-            body="P&L and balance sheet generated straight from the ledger, every figure traceable to its journal entry. Export whenever your accountant asks."
-          />
-        </div>
+        <ol className="grid gap-x-10 gap-y-12 sm:grid-cols-2">
+          {STEPS.map((s, i) => (
+            <li key={s.title} className="relative">
+              <div className="mb-5 flex items-center gap-3">
+                <span className="flex h-10 w-10 items-center justify-center rounded-md bg-forest-50 text-forest-700">
+                  <s.icon className="h-5 w-5" />
+                </span>
+                <span className="font-mono text-xs text-stone-400">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+              </div>
+              <h3 className="mb-2 text-lg font-semibold tracking-tight text-ink">{s.title}</h3>
+              <p className="max-w-md text-[15px] leading-relaxed text-stone-600">{s.body}</p>
+            </li>
+          ))}
+        </ol>
       </div>
     </section>
   );
 }
 
-function Step({ n, title, body }: { n: string; title: string; body: string }) {
-  return (
-    <div className="bg-white p-7">
-      <div className="mb-3 font-mono text-xs text-neutral-400">{n}</div>
-      <h3 className="mb-2 text-base font-semibold tracking-tight text-neutral-900">{title}</h3>
-      <p className="text-sm leading-relaxed text-neutral-600">{body}</p>
-    </div>
-  );
-}
+/* ======================================================== ledger band */
 
-/* ----------------------------------------------------------- features */
+const ENTRY = [
+  { code: "1000", name: "Bank — checking", debit: "4,058.78", credit: "" },
+  { code: "6300", name: "Payment processing fees", debit: "121.22", credit: "" },
+  { code: "4000", name: "Product revenue", debit: "", credit: "4,180.00" },
+];
 
-function Features() {
+function LedgerBand() {
   return (
-    <section id="features" className="border-b border-neutral-200 bg-white scroll-mt-16">
-      <div className="mx-auto max-w-6xl px-6 py-16">
-        <div className="mb-10 max-w-2xl">
-          <div className="mb-3 text-xs uppercase tracking-wider text-neutral-400">
-            What you get
+    <section className="bg-forest-900 text-white">
+      <div className="mx-auto grid max-w-6xl gap-14 px-6 py-20 lg:grid-cols-2 lg:gap-16 lg:py-28">
+        <div>
+          <div className="mb-4 text-xs font-semibold uppercase tracking-wider text-forest-300">
+            Why this exists
           </div>
-          <h2 className="text-2xl font-semibold tracking-tight text-neutral-900 sm:text-3xl">
-            Built like accounting software, not a categorisation toy.
+          <h2 className="mb-6 text-3xl font-semibold leading-[1.1] tracking-tight sm:text-4xl">
+            Bench shut down overnight. Nothing affordable replaced it.
           </h2>
-        </div>
-
-        <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          <Feature title="A real double-entry ledger">
-            Every transaction becomes a balanced journal entry. Debits equal credits or
-            the entry does not post — which means your statements cannot silently drift.
-          </Feature>
-          <Feature title="Stripe reconciliation that holds up">
-            The single hardest thing to get right in SaaS books. Payout and deposit share
-            one entry, fees are broken out, and the clearing account returns to zero.
-          </Feature>
-          <Feature title="Confidence scores, not black boxes">
-            Each categorisation shows how sure the agent is and why. High-confidence
-            entries post themselves; the rest wait in an inbox that stays short.
-          </Feature>
-          <Feature title="It learns your corrections">
-            Recategorise a merchant once and Booked writes the rule. The same vendor is
-            not asked about again next month.
-          </Feature>
-          <Feature title="Statements on demand">
-            Monthly P&amp;L and balance sheet, generated live from the ledger for any
-            period. Cash flow statement is next on the roadmap.
-          </Feature>
-          <Feature title="Your data stays yours">
-            Open source, self-hostable, no lock-in. If Booked ever goes the way of Bench,
-            you keep the ledger and the code that produced it.
-          </Feature>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function Feature({ title, children }: { title: string; children: React.ReactNode }) {
-  return (
-    <div>
-      <h3 className="mb-2 text-base font-semibold tracking-tight text-neutral-900">{title}</h3>
-      <p className="text-sm leading-relaxed text-neutral-600">{children}</p>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------ pricing */
-
-function Pricing() {
-  return (
-    <section id="pricing" className="border-b border-neutral-200 scroll-mt-16">
-      <div className="mx-auto max-w-6xl px-6 py-16">
-        <div className="mb-10 max-w-2xl">
-          <div className="mb-3 text-xs uppercase tracking-wider text-neutral-400">Pricing</div>
-          <h2 className="mb-3 text-2xl font-semibold tracking-tight text-neutral-900 sm:text-3xl">
-            One tenth of what the books used to cost.
-          </h2>
-          <p className="text-base leading-relaxed text-neutral-600">
-            Free while we are in beta. No card, no sales call, no annual contract.
+          <p className="mb-5 text-[15px] leading-relaxed text-forest-100/80">
+            In December 2024, Bench closed with almost no warning and thousands of small
+            businesses woke up locked out of their own books. The replacements that exist start
+            at several hundred dollars a month — more than most bootstrapped businesses spend on
+            their entire infrastructure.
+          </p>
+          <p className="text-[15px] leading-relaxed text-forest-100/80">
+            But the work itself changed. Categorising a transaction is a language problem, and
+            language models are now good at it. Reconciliation was always deterministic — it just
+            needed someone to write the matching logic. What cost $300–1,000 a month is now
+            mostly the price of the API calls.
           </p>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-3">
+        <div>
+          <div className="rounded-lg border border-forest-700/70 bg-forest-800/60 p-6 sm:p-7">
+            <div className="mb-1 text-xs font-semibold uppercase tracking-wider text-forest-300">
+              One Stripe payout, one entry
+            </div>
+            <div className="mb-6 font-mono text-xs text-forest-200/70">
+              po_1QxA7f · settled 28 Aug 2026
+            </div>
+
+            <div className="mb-2 grid grid-cols-[1fr_auto_auto] gap-x-4 border-b border-forest-700/70 pb-2 text-[10px] uppercase tracking-wider text-forest-300">
+              <span>Account</span>
+              <span className="text-right">Debit</span>
+              <span className="text-right">Credit</span>
+            </div>
+
+            {ENTRY.map((r) => (
+              <div
+                key={r.code}
+                className="grid grid-cols-[1fr_auto_auto] gap-x-4 py-2 text-sm text-forest-50"
+              >
+                <span className="truncate">
+                  <span className="font-mono text-forest-300">{r.code}</span>{" "}
+                  <span className="text-forest-100/90">{r.name}</span>
+                </span>
+                <span className="text-right font-mono tabular-nums">{r.debit || "—"}</span>
+                <span className="text-right font-mono tabular-nums">{r.credit || "—"}</span>
+              </div>
+            ))}
+
+            <div className="mt-2 grid grid-cols-[1fr_auto_auto] gap-x-4 border-t border-forest-700/70 pt-3 text-sm font-semibold">
+              <span className="text-forest-200">Balanced</span>
+              <span className="text-right font-mono tabular-nums">4,180.00</span>
+              <span className="text-right font-mono tabular-nums">4,180.00</span>
+            </div>
+
+            <p className="mt-6 flex items-start gap-2.5 text-xs leading-relaxed text-forest-100/70">
+              <IconCheck className="mt-0.5 h-4 w-4 shrink-0 text-forest-300" />
+              Debits equal credits or the entry does not post. That is the whole reason the
+              statements cannot silently drift.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* =========================================================== features */
+
+const FEATURES = [
+  {
+    icon: IconScale,
+    title: "A real double-entry ledger",
+    body: "Every transaction becomes a balanced journal entry. Debits equal credits or the entry does not post — which means your statements cannot silently drift.",
+  },
+  {
+    icon: IconSwap,
+    title: "Stripe reconciliation that holds up",
+    body: "The single hardest thing to get right in SaaS books. Payout and deposit share one entry, fees are broken out, and the clearing account returns to zero.",
+  },
+  {
+    icon: IconGauge,
+    title: "Confidence scores, not black boxes",
+    body: "Each categorisation shows how sure the agent is and why. High-confidence entries post themselves; the rest wait in an inbox that stays short.",
+  },
+  {
+    icon: IconLoop,
+    title: "It learns your corrections",
+    body: "Recategorise a merchant once and Booked writes the rule. The same vendor is not asked about again next month.",
+  },
+  {
+    icon: IconStatement,
+    title: "Statements on demand",
+    body: "Monthly P&L and balance sheet, generated live from the ledger for any period. Cash flow statement is next on the roadmap.",
+  },
+  {
+    icon: IconLock,
+    title: "Your data stays yours",
+    body: "Open source, self-hostable, no lock-in. If Booked ever goes the way of Bench, you keep the ledger and the code that produced it.",
+  },
+];
+
+function Features() {
+  return (
+    <section id="features" className="scroll-mt-16 border-b border-stone-200">
+      <div className="mx-auto max-w-6xl px-6 py-20 sm:py-28">
+        <div className="mb-14 max-w-2xl">
+          <SectionEyebrow>What you get</SectionEyebrow>
+          <SectionTitle>Built like accounting software, not a categorisation toy.</SectionTitle>
+        </div>
+
+        <div className="grid gap-px overflow-hidden rounded-lg border border-stone-200 bg-stone-200 sm:grid-cols-2 lg:grid-cols-3">
+          {FEATURES.map((f) => (
+            <div key={f.title} className="bg-white p-7">
+              <span className="mb-5 flex h-10 w-10 items-center justify-center rounded-md bg-forest-50 text-forest-700">
+                <f.icon className="h-5 w-5" />
+              </span>
+              <h3 className="mb-2 text-[15px] font-semibold tracking-tight text-ink">{f.title}</h3>
+              <p className="text-sm leading-relaxed text-stone-600">{f.body}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ============================================================ pricing */
+
+function Pricing() {
+  return (
+    <section id="pricing" className="scroll-mt-16 border-b border-stone-200 bg-white">
+      <div className="mx-auto max-w-6xl px-6 py-20 sm:py-28">
+        <div className="mb-14 max-w-2xl">
+          <SectionEyebrow>Pricing</SectionEyebrow>
+          <SectionTitle>One tenth of what the books used to cost.</SectionTitle>
+          <SectionLede>
+            Free while we are in beta. No card, no sales call, no annual contract.
+          </SectionLede>
+        </div>
+
+        <div className="grid items-start gap-5 lg:grid-cols-3">
           <PriceCard
             title="Free"
             price="$0"
@@ -502,7 +657,7 @@ function Pricing() {
             price="Free"
             note="forever"
             cta="View source"
-            href="https://github.com/learnwithalex/booked"
+            href={GITHUB}
             features={[
               "Run it on your own infra",
               "Bring your own model key",
@@ -535,33 +690,43 @@ function PriceCard({
 }) {
   return (
     <div
-      className={`flex flex-col rounded-md border p-6 ${
+      className={`relative flex flex-col rounded-lg border p-7 ${
         highlight
-          ? "border-neutral-900 bg-neutral-900 text-white"
-          : "border-neutral-200 bg-white text-neutral-900"
+          ? "border-forest-700 bg-forest-900 text-white lg:-mt-3 lg:pb-9 lg:pt-9"
+          : "border-stone-200 bg-stone-50/60 text-ink"
       }`}
     >
+      {highlight && (
+        <span className="absolute -top-2.5 left-7 rounded-full bg-forest-500 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white">
+          Most popular
+        </span>
+      )}
+
       <div
-        className={`mb-1 text-xs uppercase tracking-wider ${
-          highlight ? "text-neutral-400" : "text-neutral-500"
+        className={`mb-1.5 text-xs font-semibold uppercase tracking-wider ${
+          highlight ? "text-forest-300" : "text-stone-500"
         }`}
       >
         {title}
       </div>
-      <div className="mb-5 flex items-baseline gap-1">
-        <span className="text-3xl font-semibold tracking-tight">{price}</span>
-        <span className={`text-xs ${highlight ? "text-neutral-400" : "text-neutral-500"}`}>
+      <div className="mb-6 flex items-baseline gap-1.5">
+        <span className="text-4xl font-semibold tracking-tight">{price}</span>
+        <span className={`text-xs ${highlight ? "text-forest-200/70" : "text-stone-500"}`}>
           {note}
         </span>
       </div>
 
-      <ul className="mb-6 flex-1 space-y-2">
+      <ul className="mb-8 flex-1 space-y-2.5">
         {features.map((f) => (
           <li
             key={f}
-            className={`flex gap-2 text-sm ${highlight ? "text-neutral-300" : "text-neutral-600"}`}
+            className={`flex gap-2.5 text-sm ${highlight ? "text-forest-100/90" : "text-stone-600"}`}
           >
-            <span className={highlight ? "text-emerald-400" : "text-emerald-600"}>✓</span>
+            <IconCheck
+              className={`mt-0.5 h-4 w-4 shrink-0 ${
+                highlight ? "text-forest-300" : "text-forest-600"
+              }`}
+            />
             {f}
           </li>
         ))}
@@ -569,10 +734,10 @@ function PriceCard({
 
       <Link
         href={href}
-        className={`rounded px-4 py-2 text-center text-sm font-medium transition-colors ${
+        className={`rounded px-4 py-2.5 text-center text-sm font-medium transition-colors ${
           highlight
-            ? "bg-white text-neutral-900 hover:bg-neutral-200"
-            : "border border-neutral-300 text-neutral-700 hover:bg-neutral-50"
+            ? "bg-white text-forest-900 hover:bg-forest-50"
+            : "border border-stone-300 text-stone-700 hover:border-stone-400 hover:bg-white"
         }`}
       >
         {cta}
@@ -581,93 +746,82 @@ function PriceCard({
   );
 }
 
-/* ---------------------------------------------------------------- faq */
+/* ================================================================ faq */
+
+const FAQS = [
+  {
+    q: "Is an LLM really safe to trust with my books?",
+    a: "It is not trusted blindly. Deterministic rules handle anything predictable, and the model only proposes a category with a confidence score. Low confidence goes to your review inbox rather than into the ledger, and the double-entry engine refuses any entry that does not balance. The model suggests; the accounting rules decide.",
+  },
+  {
+    q: "What happens to my Stripe fees?",
+    a: "They are split out properly. A payout is booked as gross revenue, a separate processing-fee expense, and the net amount that hit your bank — one entry covering both sides. This is the step most spreadsheet workflows get wrong, and it is why their revenue number is usually inflated.",
+  },
+  {
+    q: "Can my accountant work with this?",
+    a: "Yes. It is a standard chart of accounts and standard double-entry journal entries, so a P&L and balance sheet come out in the format they already expect. Nothing about the output is unusual — that is deliberate.",
+  },
+  {
+    q: "What if Booked shuts down like Bench did?",
+    a: "The source is public and MIT licensed, and it is designed to be self-hosted. The failure mode that stranded Bench customers — losing access to your own historical books — is the specific thing this project is built to make impossible.",
+  },
+  {
+    q: "Do you support cash flow statements?",
+    a: "Not yet. P&L and balance sheet are live and generated from the ledger. Cash flow is the next statement on the roadmap, and the ledger already holds everything needed to produce it.",
+  },
+];
 
 function Faq() {
   return (
-    <section id="faq" className="border-b border-neutral-200 bg-white scroll-mt-16">
-      <div className="mx-auto max-w-3xl px-6 py-16">
-        <div className="mb-8">
-          <div className="mb-3 text-xs uppercase tracking-wider text-neutral-400">FAQ</div>
-          <h2 className="text-2xl font-semibold tracking-tight text-neutral-900 sm:text-3xl">
-            The questions worth asking.
-          </h2>
+    <section id="faq" className="scroll-mt-16 border-b border-stone-200 bg-sand-100">
+      <div className="mx-auto max-w-3xl px-6 py-20 sm:py-28">
+        <div className="mb-12">
+          <SectionEyebrow>FAQ</SectionEyebrow>
+          <SectionTitle>The questions worth asking.</SectionTitle>
         </div>
 
-        <div className="divide-y divide-neutral-200 border-y border-neutral-200">
-          <FaqItem q="Is an LLM really safe to trust with my books?">
-            It is not trusted blindly. Deterministic rules handle anything predictable,
-            and the model only proposes a category with a confidence score. Low
-            confidence goes to your review inbox rather than into the ledger, and the
-            double-entry engine refuses any entry that does not balance. The model
-            suggests; the accounting rules decide.
-          </FaqItem>
-          <FaqItem q="What happens to my Stripe fees?">
-            They are split out properly. A payout is booked as gross revenue, a separate
-            processing-fee expense, and the net amount that hit your bank — one entry
-            covering both sides. This is the step most spreadsheet workflows get wrong,
-            and it is why their revenue number is usually inflated.
-          </FaqItem>
-          <FaqItem q="Can my accountant work with this?">
-            Yes. It is a standard chart of accounts and standard double-entry journal
-            entries, so a P&amp;L and balance sheet come out in the format they already
-            expect. Nothing about the output is unusual — that is deliberate.
-          </FaqItem>
-          <FaqItem q="What if Booked shuts down like Bench did?">
-            The source is public and MIT licensed, and it is designed to be self-hosted.
-            The failure mode that stranded Bench customers — losing access to your own
-            historical books — is the specific thing this project is built to make
-            impossible.
-          </FaqItem>
-          <FaqItem q="Do you support cash flow statements?">
-            Not yet. P&amp;L and balance sheet are live and generated from the ledger.
-            Cash flow is the next statement on the roadmap, and the ledger already holds
-            everything needed to produce it.
-          </FaqItem>
+        <div className="divide-y divide-stone-200 border-y border-stone-200">
+          {FAQS.map((f) => (
+            <details key={f.q} className="group py-5">
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-6">
+                <span className="text-[15px] font-medium tracking-tight text-ink">{f.q}</span>
+                <IconChevron className="h-4 w-4 shrink-0 text-stone-400 transition-transform duration-200 group-open:-rotate-180" />
+              </summary>
+              <p className="mt-3 max-w-2xl text-sm leading-relaxed text-stone-600">{f.a}</p>
+            </details>
+          ))}
         </div>
       </div>
     </section>
   );
 }
 
-function FaqItem({ q, children }: { q: string; children: React.ReactNode }) {
-  return (
-    <details className="group py-5">
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
-        <span className="text-base font-medium tracking-tight text-neutral-900">{q}</span>
-        <span className="shrink-0 text-neutral-400 transition-transform group-open:rotate-45">
-          +
-        </span>
-      </summary>
-      <p className="mt-3 max-w-2xl text-sm leading-relaxed text-neutral-600">{children}</p>
-    </details>
-  );
-}
-
-/* -------------------------------------------------------- closing cta */
+/* ======================================================== closing cta */
 
 function ClosingCta() {
   return (
-    <section className="bg-neutral-900">
-      <div className="mx-auto max-w-6xl px-6 py-20 text-center">
-        <h2 className="mx-auto mb-4 max-w-2xl text-3xl font-semibold leading-tight tracking-tight text-white sm:text-4xl">
+    <section className="bg-forest-800">
+      <div className="mx-auto max-w-6xl px-6 py-24 text-center sm:py-32">
+        <h2 className="mx-auto mb-5 max-w-2xl text-3xl font-semibold leading-[1.1] tracking-tight text-white sm:text-5xl">
           Stop doing the books at midnight.
         </h2>
-        <p className="mx-auto mb-8 max-w-xl text-base leading-relaxed text-neutral-400">
-          Connect a bank and a Stripe account, and see a closed month in a few minutes.
-          Free during beta.
+        <p className="mx-auto mb-9 max-w-xl text-[17px] leading-relaxed text-forest-100/75">
+          Connect a bank and a Stripe account, and see a closed month in a few minutes. Free
+          during beta.
         </p>
         <div className="flex flex-wrap justify-center gap-3">
           <Link
             href="/login"
-            className="rounded bg-white px-5 py-2.5 text-sm font-medium text-neutral-900 transition-colors hover:bg-neutral-200"
+            className="group inline-flex items-center gap-2 rounded bg-white px-5 py-2.5 text-sm font-medium text-forest-900 transition-colors hover:bg-forest-50"
           >
             Get started free
+            <IconArrow className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
           </Link>
           <a
-            href="https://github.com/learnwithalex/booked"
-            className="rounded border border-neutral-700 px-5 py-2.5 text-sm font-medium text-neutral-300 transition-colors hover:bg-neutral-800"
+            href={GITHUB}
+            className="inline-flex items-center gap-2 rounded border border-forest-600 px-5 py-2.5 text-sm font-medium text-forest-100 transition-colors hover:bg-forest-700"
           >
+            <IconCode className="h-4 w-4" />
             Read the source
           </a>
         </div>
@@ -676,21 +830,21 @@ function ClosingCta() {
   );
 }
 
-/* ------------------------------------------------------------- footer */
+/* ============================================================= footer */
 
 function SiteFooter() {
   return (
-    <footer className="border-t border-neutral-200 bg-neutral-50">
-      <div className="mx-auto max-w-6xl px-6 py-12">
-        <div className="mb-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+    <footer className="bg-ink">
+      <div className="mx-auto max-w-6xl px-6 py-14">
+        <div className="mb-12 grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div>
-            <div className="mb-3 flex items-center gap-2">
+            <div className="mb-4 flex items-center gap-2.5">
               <Mark />
-              <span className="text-sm font-semibold tracking-tight text-neutral-900">Booked</span>
+              <span className="text-sm font-semibold tracking-tight text-white">Booked</span>
             </div>
-            <p className="max-w-xs text-xs leading-relaxed text-neutral-500">
-              Autonomous bookkeeping for small businesses and solo founders. Built to
-              replace the service that left.
+            <p className="max-w-xs text-xs leading-relaxed text-stone-400">
+              Autonomous bookkeeping for small businesses and solo founders. Built to replace the
+              service that left.
             </p>
           </div>
 
@@ -713,13 +867,13 @@ function SiteFooter() {
           <FooterCol
             title="Project"
             links={[
-              { label: "Source on GitHub", href: "https://github.com/learnwithalex/booked" },
+              { label: "Source on GitHub", href: GITHUB },
               { label: "The Build Games", href: "https://canivibecodeit.com/thebuildgames" },
             ]}
           />
         </div>
 
-        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-neutral-200 pt-6 text-xs text-neutral-400">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-stone-700/60 pt-7 text-xs text-stone-500">
           <span>© 2026 Booked. MIT licensed.</span>
           <span>Built in public, Sep 6–30 2026 · Best Replacement track.</span>
         </div>
@@ -728,24 +882,18 @@ function SiteFooter() {
   );
 }
 
-function FooterCol({
-  title,
-  links,
-}: {
-  title: string;
-  links: { label: string; href: string }[];
-}) {
+function FooterCol({ title, links }: { title: string; links: { label: string; href: string }[] }) {
   return (
     <div>
-      <div className="mb-3 text-xs font-semibold uppercase tracking-wider text-neutral-400">
+      <div className="mb-4 text-xs font-semibold uppercase tracking-wider text-stone-500">
         {title}
       </div>
-      <ul className="space-y-2">
+      <ul className="space-y-2.5">
         {links.map((l) => (
           <li key={l.label}>
             <a
               href={l.href}
-              className="text-xs text-neutral-600 transition-colors hover:text-neutral-900"
+              className="text-xs text-stone-400 transition-colors hover:text-white"
             >
               {l.label}
             </a>
@@ -754,4 +902,26 @@ function FooterCol({
       </ul>
     </div>
   );
+}
+
+/* ====================================================== section atoms */
+
+function SectionEyebrow({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mb-4 text-xs font-semibold uppercase tracking-wider text-forest-600">
+      {children}
+    </div>
+  );
+}
+
+function SectionTitle({ children }: { children: React.ReactNode }) {
+  return (
+    <h2 className="text-3xl font-semibold leading-[1.12] tracking-[-0.02em] text-ink sm:text-4xl">
+      {children}
+    </h2>
+  );
+}
+
+function SectionLede({ children }: { children: React.ReactNode }) {
+  return <p className="mt-4 text-[17px] leading-relaxed text-stone-600">{children}</p>;
 }
