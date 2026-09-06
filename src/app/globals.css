@@ -8,6 +8,7 @@
   --muted: #6b6b6b;
   --border: #e6e4e0;
   --accent: #1a1a1a;
+  --ink: #14161a;
 }
 
 html,
@@ -19,4 +20,8 @@ body {
 
 * {
   border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
 }
