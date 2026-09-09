@@ -33,7 +33,6 @@ export function RunAgentButton() {
         ],
       });
       setState("done");
-      // Reload to refresh P&L numbers
       setTimeout(() => window.location.reload(), 1500);
     } catch (e) {
       setState("error");
@@ -46,18 +45,36 @@ export function RunAgentButton() {
       <button
         onClick={run}
         disabled={state === "running"}
-        className="rounded bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700 disabled:opacity-50 transition-colors"
+        className="flex items-center gap-1.5 rounded-md bg-indigo-600 px-3 py-1.5 text-[12px] font-semibold text-white transition-colors hover:bg-indigo-500 disabled:opacity-50"
       >
-        {state === "running" ? "Running…" : "Run bookkeeper"}
+        {state === "running" ? (
+          <>
+            <span className="h-3 w-3 animate-spin rounded-full border border-white/30 border-t-white" />
+            Running…
+          </>
+        ) : (
+          <>
+            <PlayIcon />
+            Run bookkeeper
+          </>
+        )}
       </button>
       {state === "done" && result && (
-        <p className="text-xs text-neutral-500">
+        <p className="text-[11px] text-zinc-500">
           {result.categorized} categorised · {result.reconciled} reconciled · {result.posted} posted
         </p>
       )}
       {state === "error" && (
-        <p className="text-xs text-red-500">{result?.errors?.[0] ?? "Failed"}</p>
+        <p className="text-[11px] text-red-400">{result?.errors?.[0] ?? "Failed"}</p>
       )}
     </div>
+  );
+}
+
+function PlayIcon() {
+  return (
+    <svg width="10" height="10" viewBox="0 0 10 10" fill="currentColor">
+      <polygon points="2,1 9,5 2,9" />
+    </svg>
   );
 }

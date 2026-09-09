@@ -4,8 +4,6 @@ import { primaryOrgForUser } from "@/db/seed-org";
 import { db } from "@/db";
 import { InboxClient } from "./inbox-client";
 
-// Review inbox: every PENDING + CATEGORISED txn, newest first.
-// Approve (post with hint), edit (post with override + learn), or skip.
 export default async function TransactionsPage() {
   const userId = await userIdFromSession();
   if (!userId) redirect("/login");
@@ -36,14 +34,20 @@ export default async function TransactionsPage() {
     categoryHint: r.categoryHint,
   }));
 
+  const pendingCount = rows.filter((r) => r.status === "PENDING" || r.status === "CATEGORISED").length;
+
   return (
-    <main className="mx-auto max-w-4xl px-6 py-16">
-      <div className="mb-2 text-xs uppercase tracking-wider text-neutral-500">{org.name}</div>
-      <h1 className="mb-8 text-2xl font-semibold tracking-tight">
-        Transactions{" "}
-        <span className="text-base font-normal text-neutral-500">({rows.length})</span>
-      </h1>
+    <div className="px-8 py-6">
+      <div className="mb-6">
+        <div className="text-[11px] uppercase tracking-wider text-zinc-600">Transactions</div>
+        <h1 className="mt-0.5 text-[18px] font-semibold text-zinc-100">
+          Inbox
+          {pendingCount > 0 && (
+            <span className="ml-2 text-[13px] font-normal text-zinc-500">{pendingCount} need attention</span>
+          )}
+        </h1>
+      </div>
       <InboxClient initial={serialised} accounts={accounts} />
-    </main>
+    </div>
   );
 }
