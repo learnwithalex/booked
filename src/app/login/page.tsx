@@ -31,6 +31,19 @@ export default function LoginPage() {
         No password. We email you a link that expires in 15 minutes.
       </p>
 
+      <div className="mb-8 rounded border border-neutral-200 bg-neutral-50 p-4 text-sm">
+        <p className="mb-2 font-medium text-neutral-800">Just here to explore?</p>
+        <p className="mb-3 text-neutral-600">
+          The demo account has 14 pre-loaded transactions already categorised.
+        </p>
+        <a
+          href="/api/auth/demo"
+          className="inline-block rounded bg-neutral-900 px-4 py-2 text-xs font-medium text-white"
+        >
+          Open demo →
+        </a>
+      </div>
+
       {state === "sent" ? (
         <div className="rounded border border-neutral-200 bg-white p-6 text-sm">
           <p className="mb-2 font-medium">Check your inbox.</p>
