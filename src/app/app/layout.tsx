@@ -17,11 +17,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   });
 
   return (
-    <div className="flex h-screen overflow-hidden bg-zinc-950 text-zinc-100">
+    <div className="app-shell flex h-screen overflow-hidden">
       <SidebarNav orgName={org.name} pendingCount={pendingRows.length} />
-      <div className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto min-w-0">
         {children}
-      </div>
+      </main>
     </div>
   );
 }

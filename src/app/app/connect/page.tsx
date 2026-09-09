@@ -48,13 +48,13 @@ export default function ConnectPage() {
   }
 
   return (
-    <div className="px-8 py-6">
+    <div className="px-6 py-5">
       <div className="mb-6">
-        <div className="text-[11px] uppercase tracking-wider text-zinc-600">Connect</div>
-        <h1 className="mt-0.5 text-[18px] font-semibold text-zinc-100">Your money, in</h1>
+        <div className="text-[11px] font-medium uppercase tracking-widest text-lx-faint">Connect</div>
+        <h1 className="mt-1 text-[20px] font-semibold tracking-tight text-lx-text">Your money, in</h1>
       </div>
 
-      <div className="flex max-w-xl flex-col gap-4">
+      <div className="flex max-w-lg flex-col gap-3">
         <ConnectCard
           title="Bank account"
           description="Connect via Plaid. Transactions sync every day."
@@ -72,7 +72,10 @@ export default function ConnectPage() {
           icon={<StripeIcon />}
         />
         {status && (
-          <div className="rounded-lg border border-zinc-700 bg-zinc-800/60 px-4 py-3 text-[12px] text-zinc-300">
+          <div
+            className="rounded px-4 py-3 text-[12px] text-lx-muted"
+            style={{ border: "1px solid #2a2a32", background: "#1c1c22" }}
+          >
             {status}
           </div>
         )}
@@ -92,20 +95,27 @@ function ConnectCard({
   icon: React.ReactNode;
 }) {
   return (
-    <div className="flex items-center justify-between rounded-lg border border-zinc-800 bg-zinc-900 px-5 py-4">
-      <div className="flex items-center gap-4">
-        <div className="flex h-9 w-9 items-center justify-center rounded-md border border-zinc-700 bg-zinc-800 text-zinc-400">
+    <div
+      className="flex items-center justify-between rounded-md px-5 py-4"
+      style={{ border: "1px solid #2a2a32", background: "#1c1c22" }}
+    >
+      <div className="flex items-center gap-3">
+        <div
+          className="flex h-8 w-8 items-center justify-center rounded text-lx-faint"
+          style={{ border: "1px solid #2a2a32", background: "rgba(255,255,255,0.04)" }}
+        >
           {icon}
         </div>
         <div>
-          <div className="text-[13px] font-semibold text-zinc-200">{title}</div>
-          <div className="text-[11px] text-zinc-500">{description}</div>
+          <div className="text-[13px] font-semibold text-lx-text">{title}</div>
+          <div className="text-[11px] text-lx-faint">{description}</div>
         </div>
       </div>
       <button
         onClick={onClick}
         disabled={disabled}
-        className="rounded-md border border-zinc-700 px-3 py-1.5 text-[12px] font-medium text-zinc-300 transition-colors hover:border-zinc-500 hover:text-zinc-100 disabled:opacity-40"
+        className="rounded px-3 py-1.5 text-[12px] font-medium text-lx-muted transition-colors hover:text-lx-text disabled:opacity-40"
+        style={{ border: "1px solid #2a2a32", background: "rgba(255,255,255,0.04)" }}
       >
         {buttonLabel}
       </button>
@@ -115,17 +125,17 @@ function ConnectCard({
 
 function BankIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M2 6h12M8 2l6 4H2l6-4zM4 6v6M8 6v6M12 6v6M2 12h12" />
+    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1.5 6.5h12M7.5 2l6 4.5h-12l6-4.5zM3.5 6.5v6M7.5 6.5v6M11.5 6.5v6M1.5 12.5h12" />
     </svg>
   );
 }
 
 function StripeIcon() {
   return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-      <rect x="2" y="2" width="12" height="12" rx="2" />
-      <path d="M5.5 8.5c.3.8 1 1 1.5 1 .8 0 1.5-.4 1.5-1.2 0-1.5-3-1-3-2.3 0-.8.7-1 1.5-1 .5 0 1.1.2 1.5.7" />
+    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round">
+      <rect x="2" y="2" width="11" height="11" rx="2" />
+      <path d="M5 8.5c.3.8 1 1 1.5 1 .8 0 1.5-.4 1.5-1.2 0-1.5-3-1-3-2.3 0-.8.7-1 1.5-1 .5 0 1.1.2 1.5.7" />
     </svg>
   );
 }

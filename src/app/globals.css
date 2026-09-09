@@ -11,16 +11,25 @@
   --ink: #14171a;
 }
 
-::selection {
-  background: #d3e9dd;
-  color: #0a2c21;
-}
-
 html,
 body {
   background: var(--bg);
   color: var(--fg);
-  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  font-feature-settings: "cv01", "cv02", "cv03", "cv04", "cv11";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* App shell: full dark Linear-style theme */
+.app-shell {
+  background: #111116;
+  color: #e2e2e9;
+  font-feature-settings: "cv01", "cv02", "cv03", "cv04";
+}
+
+::selection {
+  background: #d3e9dd;
+  color: #0a2c21;
 }
 
 * {

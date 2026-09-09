@@ -45,7 +45,8 @@ export function RunAgentButton() {
       <button
         onClick={run}
         disabled={state === "running"}
-        className="flex items-center gap-1.5 rounded-md bg-indigo-600 px-3 py-1.5 text-[12px] font-semibold text-white transition-colors hover:bg-indigo-500 disabled:opacity-50"
+        className="flex items-center gap-1.5 rounded px-3 py-1.5 text-[12px] font-medium text-white transition-opacity disabled:opacity-50"
+        style={{ background: "#5e6ad2" }}
       >
         {state === "running" ? (
           <>
@@ -60,12 +61,12 @@ export function RunAgentButton() {
         )}
       </button>
       {state === "done" && result && (
-        <p className="text-[11px] text-zinc-500">
-          {result.categorized} categorised · {result.reconciled} reconciled · {result.posted} posted
+        <p className="text-[11px] text-lx-faint">
+          {result.categorized} categorised · {result.posted} posted
         </p>
       )}
       {state === "error" && (
-        <p className="text-[11px] text-red-400">{result?.errors?.[0] ?? "Failed"}</p>
+        <p className="text-[11px] text-lx-red">{result?.errors?.[0] ?? "Failed"}</p>
       )}
     </div>
   );

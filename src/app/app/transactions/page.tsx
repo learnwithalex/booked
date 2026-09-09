@@ -22,8 +22,10 @@ export default async function TransactionsPage() {
     columns: { code: true, name: true },
   });
 
-  const serialised = rows.map((r) => ({
+  const total = rows.length;
+  const serialised = rows.map((r, i) => ({
     id: r.id,
+    seq: total - i,
     occurredAt: r.occurredAt.toISOString().slice(0, 10),
     merchant: r.merchant,
     description: r.description,
@@ -37,13 +39,13 @@ export default async function TransactionsPage() {
   const pendingCount = rows.filter((r) => r.status === "PENDING" || r.status === "CATEGORISED").length;
 
   return (
-    <div className="px-8 py-6">
+    <div className="px-6 py-5">
       <div className="mb-6">
-        <div className="text-[11px] uppercase tracking-wider text-zinc-600">Transactions</div>
-        <h1 className="mt-0.5 text-[18px] font-semibold text-zinc-100">
+        <div className="text-[11px] font-medium uppercase tracking-widest text-lx-faint">Transactions</div>
+        <h1 className="mt-1 text-[20px] font-semibold tracking-tight text-lx-text">
           Inbox
           {pendingCount > 0 && (
-            <span className="ml-2 text-[13px] font-normal text-zinc-500">{pendingCount} need attention</span>
+            <span className="ml-2.5 text-[14px] font-normal text-lx-faint">{pendingCount} need attention</span>
           )}
         </h1>
       </div>

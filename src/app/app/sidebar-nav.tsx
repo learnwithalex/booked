@@ -9,10 +9,10 @@ interface Props {
 }
 
 const NAV = [
-  { href: "/app",              label: "Overview",      icon: <HomeIcon /> },
-  { href: "/app/transactions", label: "Transactions",  icon: <ListIcon /> },
-  { href: "/app/statements",   label: "Statements",    icon: <TableIcon /> },
-  { href: "/app/connect",      label: "Connect",       icon: <PlusIcon /> },
+  { href: "/app",              label: "Overview",     icon: <HomeIcon /> },
+  { href: "/app/transactions", label: "Transactions", icon: <InboxIcon /> },
+  { href: "/app/statements",   label: "Statements",   icon: <ChartIcon /> },
+  { href: "/app/connect",      label: "Connect",      icon: <PlugIcon /> },
 ];
 
 export function SidebarNav({ orgName, pendingCount }: Props) {
@@ -23,41 +23,60 @@ export function SidebarNav({ orgName, pendingCount }: Props) {
     return pathname.startsWith(href);
   }
 
+  const initial = orgName.slice(0, 1).toUpperCase();
+
   return (
-    <aside className="flex h-screen w-[220px] shrink-0 flex-col border-r border-zinc-800 bg-zinc-900">
-      {/* Logo */}
-      <div className="flex h-[52px] items-center gap-2.5 border-b border-zinc-800 px-4">
-        <BookIcon />
-        <span className="text-[14px] font-semibold tracking-tight text-zinc-100">Booked</span>
+    <aside
+      className="flex h-screen w-[232px] shrink-0 flex-col"
+      style={{ background: "#14141a", borderRight: "1px solid rgba(255,255,255,0.06)" }}
+    >
+      {/* Workspace header */}
+      <div
+        className="flex h-11 items-center gap-2 px-3"
+        style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+      >
+        <div
+          className="flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded text-[11px] font-bold text-white"
+          style={{ background: "#5e6ad2" }}
+        >
+          {initial}
+        </div>
+        <span className="flex-1 truncate text-[13px] font-semibold text-lx-text">
+          {orgName}
+        </span>
+        <ChevronDownIcon />
       </div>
 
-      {/* Org */}
-      <div className="border-b border-zinc-800 px-4 py-3">
-        <span className="text-[11px] font-medium uppercase tracking-wider text-zinc-500">
-          {orgName}
+      {/* Section label */}
+      <div className="px-3 pb-1 pt-4">
+        <span className="text-[10px] font-semibold uppercase tracking-widest text-lx-faint">
+          Workspace
         </span>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 overflow-y-auto px-2 py-2">
+      <nav className="flex-1 overflow-y-auto px-2 py-0.5">
         {NAV.map(({ href, label, icon }) => {
           const active = isActive(href);
           return (
             <Link
               key={href}
               href={href}
-              className={`flex items-center gap-2.5 rounded-md px-2.5 py-[7px] text-[13px] transition-colors ${
+              className={`flex h-7 items-center gap-1.5 rounded px-2 text-[13px] transition-colors ${
                 active
-                  ? "bg-zinc-800 text-zinc-50"
-                  : "text-zinc-400 hover:bg-zinc-800/60 hover:text-zinc-200"
+                  ? "bg-[rgba(94,106,210,0.1)] text-lx-text"
+                  : "text-lx-muted hover:bg-[rgba(255,255,255,0.04)] hover:text-lx-text"
               }`}
             >
-              <span className={`shrink-0 ${active ? "text-indigo-400" : "text-zinc-500"}`}>
+              <span className={active ? "text-lx-purple" : "text-lx-faint"}>
                 {icon}
               </span>
               <span className="flex-1">{label}</span>
               {label === "Transactions" && pendingCount > 0 && (
-                <span className="rounded-full bg-indigo-500/20 px-1.5 py-0.5 text-[10px] font-semibold text-indigo-300">
+                <span
+                  className="rounded-full px-1.5 py-0.5 text-[10px] font-semibold"
+                  style={{ background: "rgba(94,106,210,0.15)", color: "#5e6ad2" }}
+                >
                   {pendingCount}
                 </span>
               )}
@@ -67,12 +86,21 @@ export function SidebarNav({ orgName, pendingCount }: Props) {
       </nav>
 
       {/* Footer */}
-      <div className="border-t border-zinc-800 px-4 py-3">
+      <div
+        className="px-2 py-3"
+        style={{ borderTop: "1px solid rgba(255,255,255,0.06)" }}
+      >
         <Link
           href="/login"
-          className="text-[11px] text-zinc-600 hover:text-zinc-400"
+          className="flex h-7 items-center gap-2 rounded px-2 text-[12px] text-lx-faint transition-colors hover:bg-[rgba(255,255,255,0.04)] hover:text-lx-muted"
         >
-          Sign out
+          <div
+            className="flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-semibold"
+            style={{ background: "#252532", color: "#8a8a99" }}
+          >
+            {initial}
+          </div>
+          <span>Sign out</span>
         </Link>
       </div>
     </aside>
@@ -81,49 +109,46 @@ export function SidebarNav({ orgName, pendingCount }: Props) {
 
 function HomeIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M1 5.5L7 1l6 4.5V13H9V9H5v4H1V5.5z" />
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M1.5 6L7 1.5 12.5 6V13a.5.5 0 0 1-.5.5H9.5V9.5h-5V13.5H2a.5.5 0 0 1-.5-.5V6z" />
     </svg>
   );
 }
 
-function ListIcon() {
+function InboxIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-      <line x1="3" y1="4" x2="11" y2="4" />
-      <line x1="3" y1="7" x2="11" y2="7" />
-      <line x1="3" y1="10" x2="11" y2="10" />
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="1.5" y="1.5" width="11" height="11" rx="1.5" />
+      <path d="M1.5 9h2.75l1.25 2h3l1.25-2H12.5" />
     </svg>
   );
 }
 
-function TableIcon() {
+function ChartIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="1" y="1" width="12" height="12" rx="1.5" />
-      <line x1="1" y1="5" x2="13" y2="5" />
-      <line x1="7" y1="5" x2="7" y2="13" />
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="1.5" y="1.5" width="11" height="11" rx="1.5" />
+      <line x1="1.5" y1="6" x2="12.5" y2="6" />
+      <line x1="6" y1="6" x2="6" y2="12.5" />
     </svg>
   );
 }
 
-function PlusIcon() {
+function PlugIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-      <circle cx="7" cy="7" r="6" />
-      <line x1="7" y1="4" x2="7" y2="10" />
-      <line x1="4" y1="7" x2="10" y2="7" />
+    <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M5 1v3M9 1v3" />
+      <rect x="3" y="4" width="8" height="4" rx="1" />
+      <path d="M7 8v3" />
+      <path d="M5.5 11h3" />
     </svg>
   );
 }
 
-function BookIcon() {
+function ChevronDownIcon() {
   return (
-    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="text-indigo-400">
-      <path d="M3 3h7a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H3V3z" />
-      <path d="M12 5h2a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-2" />
-      <line x1="6" y1="7" x2="9" y2="7" />
-      <line x1="6" y1="10" x2="9" y2="10" />
+    <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" className="text-lx-faint">
+      <path d="M3 4.5l3 3 3-3" />
     </svg>
   );
 }

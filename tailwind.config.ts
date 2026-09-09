@@ -5,10 +5,23 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        sans: ["ui-sans-serif", "system-ui", "-apple-system", "Segoe UI", "Roboto", "sans-serif"],
+        sans: ["var(--font-inter)", "ui-sans-serif", "system-ui", "-apple-system", "sans-serif"],
         mono: ["ui-monospace", "SFMono-Regular", "Menlo", "monospace"],
       },
       colors: {
+        lx: {
+          bg: "#111116",
+          sidebar: "#14141a",
+          surface: "#1c1c22",
+          border: "#2a2a32",
+          text: "#e2e2e9",
+          muted: "#8a8a99",
+          faint: "#4a4a5a",
+          purple: "#5e6ad2",
+          amber: "#f2b030",
+          green: "#26c16b",
+          red: "#e3493c",
+        },
         ink: "#14171a",
         forest: {
           50: "#edf6f1",
@@ -28,7 +41,6 @@ const config: Config = {
           200: "#e9e2d5",
           300: "#d9cfbc",
         },
-        // measured from bench.co — used only by /replica
         bench: {
           navy: "#062D60",
           ink: "#121316",
