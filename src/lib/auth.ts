@@ -19,7 +19,7 @@ const TOKEN_TTL_MS = 15 * 60 * 1000; // 15 minutes
 // user for our own missing config.
 export class InvalidEmailError extends Error {}
 
-function appUrl() {
+export function appUrl() {
   // An unset APP_URL and an empty one must behave the same: `??` alone would
   // let "" through and email a host-less relative link that no client resolves.
   const configured = process.env.APP_URL?.trim();

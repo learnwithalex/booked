@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
+import { appUrl } from "@/lib/auth";
 import { createSessionToken, setSessionCookie } from "@/lib/session";
 
 const DEMO_EMAIL = "demo@booked.app";
@@ -20,11 +21,13 @@ export async function GET(req: Request) {
     where: (u, { eq }) => eq(u.email, DEMO_EMAIL),
   });
 
+  const base = appUrl();
+
   if (!user) {
-    return NextResponse.redirect(new URL("/login?error=demo-not-seeded", req.url));
+    return NextResponse.redirect(`${base}/login?error=demo-not-seeded`);
   }
 
   const session = await createSessionToken(user.id);
   await setSessionCookie(session);
-  return NextResponse.redirect(new URL("/app", req.url));
+  return NextResponse.redirect(`${base}/app`);
 }
